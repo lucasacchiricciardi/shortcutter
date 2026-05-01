@@ -10,6 +10,8 @@
 [![Website](https://img.shields.io/badge/lucasacchi.net-Visit-181717?logo=googlechrome&logoColor=white)](https://lucasacchi.net)
 [![YouTube](https://img.shields.io/badge/YouTube-%40LucaSacchiNet-FF0000?logo=youtube&logoColor=white)](https://www.youtube.com/@LucaSacchiNet)
 
+📖 **Read the docs and the lessons learned** → <https://lucasacchiricciardi.github.io/shortcutter/>
+
 > 👋 **Like this project?** Connect with me on [LinkedIn](https://www.linkedin.com/in/lucasacchi/) — I share the technical stories behind tools like this one.
 
 ## What is this?
@@ -83,7 +85,7 @@ ollama pull llava:7b        # ~5 GB (only needed for shorts)
 ### Install Python dependencies
 
 ```bash
-git clone https://github.com/<your-username>/shortcutter
+git clone https://github.com/lucasacchiricciardi/shortcutter
 cd shortcutter
 python -m venv venv
 source venv/bin/activate

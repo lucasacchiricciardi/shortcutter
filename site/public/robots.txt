@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lucasacchiricciardi.github.io/shortcutter/sitemap-index.xml

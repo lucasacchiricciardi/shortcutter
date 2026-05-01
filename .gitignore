@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+venv/
+.venv/
+env/
+*.bak
+*.v[0-9]*.bak
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Output / temp files
+/tmp/
+*.tmp
+*.log
+short_analysis_*/
+news_analysis_*/
+
+# Real outputs (only commit anonymized samples in examples/)
+output_*.json
+output_*.md
+!examples/output_*_sample.*
+
+# Credentials / secrets
+.env
+.env.local
+*.credentials.json
+*.token
+
+# n8n with real credentials
+n8n/private/
+*-with-credentials.json

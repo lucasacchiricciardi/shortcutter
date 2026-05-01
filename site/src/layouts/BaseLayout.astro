@@ -1,0 +1,139 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  wide?: boolean;
+}
+
+const { title, description = 'Self-hosted AI pipeline that turns YouTube videos into structured digests using local LLMs.', wide = false } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a href={base + '/'} class="brand">shortcutter</a>
+        <nav class="nav">
+          <a href={base + '/'}>home</a>
+          <a href={base + '/docs/lessons-learned'}>lessons</a>
+          <a href={base + '/docs/architecture'}>architecture</a>
+          <a href="https://github.com/lucasacchiricciardi/shortcutter" target="_blank" rel="noopener">github</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class={wide ? 'wide' : ''}>
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p class="muted">
+          Built by <a href="https://www.linkedin.com/in/lucasacchi/" target="_blank" rel="noopener">Luca Sacchi</a> · MIT License · <a href="https://github.com/lucasacchiricciardi/shortcutter" target="_blank" rel="noopener">source on GitHub</a>
+        </p>
+        <p class="muted small">
+          Following the 3 rules of Sacchi: safety first, little often, double check.
+        </p>
+      </div>
+    </footer>
+
+    <style>
+      .site-header {
+        border-bottom: 1px solid var(--color-border);
+        background: var(--color-bg);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      .site-header .container {
+        max-width: var(--wide-width);
+        margin: 0 auto;
+        padding: var(--space-4) var(--space-6);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-6);
+      }
+
+      .brand {
+        font-weight: 600;
+        font-size: 1rem;
+        text-decoration: none;
+        color: var(--color-text);
+        letter-spacing: -0.02em;
+      }
+
+      .nav {
+        display: flex;
+        gap: var(--space-6);
+        font-size: 0.875rem;
+      }
+
+      .nav a {
+        text-decoration: none;
+        color: var(--color-text-muted);
+      }
+
+      .nav a:hover {
+        color: var(--color-text);
+        opacity: 1;
+      }
+
+      .site-footer {
+        border-top: 1px solid var(--color-border);
+        padding: var(--space-8) 0;
+        margin-top: var(--space-16);
+      }
+
+      .site-footer .container {
+        max-width: var(--wide-width);
+        margin: 0 auto;
+        padding: 0 var(--space-6);
+      }
+
+      .site-footer p {
+        margin: 0 0 var(--space-2);
+        font-size: 0.875rem;
+      }
+
+      .site-footer p.small {
+        font-size: 0.8125rem;
+      }
+
+      @media (max-width: 600px) {
+        .site-header .container {
+          flex-direction: column;
+          gap: var(--space-3);
+          align-items: flex-start;
+        }
+        .nav {
+          gap: var(--space-4);
+        }
+      }
+    </style>
+  </body>
+</html>

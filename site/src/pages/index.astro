@@ -1,0 +1,238 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const base = import.meta.env.BASE_URL;
+
+const lessons = [
+  {
+    title: 'Small LLMs hallucinate predictably',
+    body: 'A 4B-parameter model that cannot find a GitHub repo will invent one — always with the "anthropics/" prefix. Stricter prompts do not help. The fix is a HEAD request that validates the URL before publishing it.',
+  },
+  {
+    title: 'Same fixer, different transcripts',
+    body: 'A transcript fixer that produces 19 perfect corrections on a 3,400-character news digest collapses entirely on a 1,000-character short. Below 1,500 characters the prompt overwhelms the input. Threshold-based skip wins.',
+  },
+  {
+    title: 'A 5-line sanity check is gold',
+    body: 'When the LLM tried to replace the audio transcript with the video description, a single "if length-difference > 30% then return raw" prevented data corruption from propagating downstream. Five lines, one project saved.',
+  },
+  {
+    title: 'Sometimes the bug is upstream',
+    body: 'When output is incoherent and the input is corrupt (a creator uploaded a video with mismatched audio), the most honest behaviour is reporting the incoherence — not inventing a confident summary. "I do not know" is a feature.',
+  },
+  {
+    title: 'The 3 rules of Sacchi',
+    body: 'Safety first — design for the failure case. Little often — nine focused versions instead of one big-bang rewrite. Double check — a careful look found a Python variable shadowing bug that silently reduced a 3,400-char transcript to "ola".',
+  },
+];
+
+const stats = [
+  { label: 'Models', value: 'Whisper · llava 7B · qwen3.5 4B' },
+  { label: 'Hardware', value: 'AMD iGPU · 8 GB VRAM · ROCm' },
+  { label: 'Performance', value: '~100 s short · ~270 s digest' },
+];
+---
+<BaseLayout title="Shortcutter — Self-hosted AI pipeline for YouTube">
+  <section class="hero">
+    <p class="eyebrow">Self-hosted AI pipeline</p>
+    <h1>Turn YouTube videos into structured digests.</h1>
+    <p class="lead">
+      Whisper transcribes the audio. llava analyses the frames. qwen extracts the data.
+      All running locally — no external APIs, no recurring costs, no vendor lock-in.
+    </p>
+    <div class="cta-row">
+      <a href="https://github.com/lucasacchiricciardi/shortcutter" class="btn btn-primary" target="_blank" rel="noopener">
+        view on github →
+      </a>
+      <a href={base + '/docs/lessons-learned'} class="btn btn-secondary">
+        read the lessons
+      </a>
+    </div>
+  </section>
+
+  <section class="stats">
+    {stats.map((stat) => (
+      <div class="stat">
+        <p class="stat-label">{stat.label}</p>
+        <p class="stat-value">{stat.value}</p>
+      </div>
+    ))}
+  </section>
+
+  <section class="why">
+    <h2>Why it exists</h2>
+    <p>
+      I follow a YouTube channel that publishes daily AI news as 2-minute shorts.
+      The links to mentioned tools and repositories are not in the description.
+      They are not in the channel bio. They are spoken aloud, only.
+    </p>
+    <p>
+      When you watch 30 videos a month, you lose half the information you wanted to act on.
+      Shortcutter solves that with a fully local pipeline.
+    </p>
+  </section>
+
+  <section class="how">
+    <h2>How it works</h2>
+    <ol>
+      <li><strong>Download</strong> — yt-dlp pulls the video and metadata.</li>
+      <li><strong>Transcribe</strong> — Whisper-medium turns audio into Italian text with auto-detected language.</li>
+      <li><strong>Fix</strong> — an LLM corrects acoustic errors using the description as ground truth (skipped on short transcripts).</li>
+      <li><strong>See</strong> — llava extracts text and structure from key frames (OCR for screenshots and READMEs).</li>
+      <li><strong>Reason</strong> — qwen3.5 cross-checks audio, frames, and description to identify the main resource.</li>
+      <li><strong>Validate</strong> — every GitHub URL is confirmed via a HEAD request before being published.</li>
+      <li><strong>Output</strong> — unified JSON schema and a human-readable Markdown digest.</li>
+    </ol>
+  </section>
+
+  <section class="lessons">
+    <h2>Five lessons learned</h2>
+    <p class="muted">
+      Building this in a single intense day produced lessons worth keeping.
+      The full write-up is in <a href={base + '/docs/lessons-learned'}>docs/lessons-learned</a>.
+    </p>
+    <div class="lesson-list">
+      {lessons.map((lesson, i) => (
+        <article class="lesson">
+          <span class="lesson-num">{String(i + 1).padStart(2, '0')}</span>
+          <div>
+            <h3>{lesson.title}</h3>
+            <p>{lesson.body}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="connect">
+    <h2>Built by Luca Sacchi</h2>
+    <p>
+      Linux/Unix sysadmin and system architect with 25+ years of experience.
+      Active educator across multiple Italian higher-education and vocational training programs (Cisco CCNA, ITS, IFTS).
+    </p>
+    <p>
+      <strong>If this project resonates with you</strong> — whether you are into local AI, network engineering,
+      automation, or just want to follow along as I build more — let&rsquo;s connect on LinkedIn.
+    </p>
+    <div class="cta-row">
+      <a href="https://www.linkedin.com/in/lucasacchi/" class="btn btn-primary" target="_blank" rel="noopener">
+        connect on linkedin →
+      </a>
+      <a href="https://www.youtube.com/@LucaSacchiNet" class="btn btn-secondary" target="_blank" rel="noopener">
+        youtube
+      </a>
+      <a href="https://lucasacchi.net" class="btn btn-secondary" target="_blank" rel="noopener">
+        lucasacchi.net
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    padding: var(--space-8) 0 var(--space-12);
+  }
+
+  .hero h1 {
+    font-size: 2.75rem;
+    margin: 0 0 var(--space-4);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+
+  .lead {
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    max-width: 600px;
+    margin-bottom: var(--space-8);
+  }
+
+  .cta-row {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--color-border);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-16);
+    overflow: hidden;
+  }
+
+  .stat {
+    background: var(--color-bg);
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .stat-label {
+    font-size: 0.8125rem;
+    color: var(--color-text-subtle);
+    margin: 0 0 var(--space-2);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .stat-value {
+    font-size: 0.9375rem;
+    margin: 0;
+    line-height: 1.5;
+    color: var(--color-text);
+  }
+
+  .why, .how, .lessons, .connect {
+    margin-bottom: var(--space-16);
+  }
+
+  .lesson-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .lesson {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: var(--space-4);
+    padding: var(--space-5) var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+
+  .lesson-num {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--color-text-subtle);
+    padding-top: 4px;
+  }
+
+  .lesson h3 {
+    margin: 0 0 var(--space-2);
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .lesson p {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.9375rem;
+  }
+
+  @media (max-width: 700px) {
+    .hero h1 {
+      font-size: 2rem;
+    }
+    .stats {
+      grid-template-columns: 1fr;
+    }
+    .lesson {
+      grid-template-columns: 40px 1fr;
+      padding: var(--space-4);
+    }
+  }
+</style>

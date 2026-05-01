@@ -1,0 +1,170 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const docs = await getCollection('docs');
+  return docs.map((entry: CollectionEntry<'docs'>) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'docs'>;
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+const base = import.meta.env.BASE_URL;
+
+const allDocs = (await getCollection('docs')).sort(
+  (a, b) => (a.data.order ?? 99) - (b.data.order ?? 99)
+);
+---
+<BaseLayout title={`${entry.data.title} — Shortcutter docs`} description={entry.data.description}>
+  <div class="docs-layout">
+    <aside class="docs-nav">
+      <p class="eyebrow">Docs</p>
+      <ul>
+        {allDocs.map((doc) => (
+          <li>
+            <a
+              href={`${base}/docs/${doc.slug}`}
+              class={doc.slug === entry.slug ? 'active' : ''}
+            >
+              {doc.data.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </aside>
+
+    <article class="docs-content">
+      <p class="eyebrow">Documentation</p>
+      <h1>{entry.data.title}</h1>
+      {entry.data.description && (
+        <p class="lead">{entry.data.description}</p>
+      )}
+      {entry.data.updated && (
+        <p class="updated">Last updated: <time>{entry.data.updated}</time></p>
+      )}
+      <div class="prose">
+        <Content />
+      </div>
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .docs-layout {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: var(--space-12);
+    align-items: start;
+  }
+
+  .docs-nav {
+    position: sticky;
+    top: var(--space-12);
+    padding-top: var(--space-8);
+  }
+
+  .docs-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .docs-nav li {
+    margin-bottom: var(--space-2);
+  }
+
+  .docs-nav a {
+    display: block;
+    padding: var(--space-2) 0;
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    padding-left: var(--space-3);
+    margin-left: calc(-1 * var(--space-3));
+  }
+
+  .docs-nav a:hover {
+    color: var(--color-text);
+    opacity: 1;
+  }
+
+  .docs-nav a.active {
+    color: var(--color-text);
+    border-left-color: var(--color-text);
+    font-weight: 500;
+  }
+
+  .docs-content {
+    min-width: 0;
+  }
+
+  .docs-content h1 {
+    margin-bottom: var(--space-4);
+    font-size: 2rem;
+  }
+
+  .docs-content .lead {
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-6);
+  }
+
+  .updated {
+    font-size: 0.8125rem;
+    color: var(--color-text-subtle);
+    margin: 0 0 var(--space-8);
+  }
+
+  .prose :global(h2) {
+    font-size: 1.375rem;
+    margin-top: var(--space-12);
+  }
+
+  .prose :global(h3) {
+    font-size: 1.0625rem;
+    margin-top: var(--space-8);
+  }
+
+  .prose :global(table) {
+    font-size: 0.9375rem;
+  }
+
+  @media (max-width: 800px) {
+    .docs-layout {
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+    }
+    .docs-nav {
+      position: static;
+      padding-top: 0;
+      padding-bottom: var(--space-4);
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: var(--space-4);
+    }
+    .docs-nav ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+    }
+    .docs-nav li {
+      margin: 0;
+    }
+    .docs-nav a {
+      border-left: none;
+      padding-left: 0;
+      margin-left: 0;
+    }
+    .docs-nav a.active {
+      border-left: none;
+      border-bottom: 2px solid var(--color-text);
+    }
+  }
+</style>
