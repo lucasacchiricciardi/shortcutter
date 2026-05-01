@@ -1,0 +1,94 @@
+name: Bug report
+description: Report a bug in shortcutter pipelines
+title: "[BUG] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report. Pipelines that involve
+        local LLMs fail in subtle ways — the more context you can give, the
+        easier it is to diagnose. None of the version fields are extreme overkill.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Brief description of the bug — what did you see vs what you expected?
+      placeholder: |
+        I ran ... and expected ... but got ...
+    validations:
+      required: true
+
+  - type: input
+    id: command
+    attributes:
+      label: Command you ran
+      description: The exact CLI invocation that triggered the bug.
+      placeholder: python scripts/analyze_video.py "https://www.youtube.com/watch?v=..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: pipeline
+    attributes:
+      label: Which pipeline?
+      options:
+        - analyze_video.py (router)
+        - analyze_news.py
+        - analyze_short.py
+        - other / unsure
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or error output
+      description: Paste the error traceback or relevant log lines. Redact tokens/keys if any.
+      render: shell
+
+  - type: input
+    id: video-url
+    attributes:
+      label: Video URL (if reproducible)
+      description: A YouTube URL that triggers the bug, if you can share one.
+
+  - type: input
+    id: os
+    attributes:
+      label: OS / distribution
+      placeholder: Ubuntu 24.04, Fedora 40, macOS 14, Windows 11 + WSL2
+    validations:
+      required: true
+
+  - type: input
+    id: python
+    attributes:
+      label: Python version
+      description: Output of `python --version`.
+      placeholder: "3.12.3"
+    validations:
+      required: true
+
+  - type: input
+    id: ollama
+    attributes:
+      label: Ollama version
+      description: Output of `ollama --version`.
+      placeholder: "0.21.2"
+    validations:
+      required: true
+
+  - type: input
+    id: gpu
+    attributes:
+      label: GPU / acceleration
+      description: GPU model and driver/runtime stack you're using (or "CPU only").
+      placeholder: AMD Radeon 780M with ROCm 6.2 / NVIDIA RTX 4090 / Apple M2 / CPU only
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: Screenshots, related issues, hypotheses, workarounds you tried.
