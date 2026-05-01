@@ -2,7 +2,7 @@
 title: Lessons learned
 description: Five hard-won lessons from one intense day of building a multi-script LLM pipeline.
 order: 1
-updated: 2026-04-30
+updated: "2026-04-30"
 ---
 
 Documented while still fresh. The five lessons below come from finding and fixing real bugs in real production code — not from hindsight retrofitting.

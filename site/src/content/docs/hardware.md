@@ -2,7 +2,7 @@
 title: Hardware setup
 description: The exact mini PC this pipeline runs on — a Minisforum AI X1-255 upgraded to 64 GB — with the real ROCm and Ollama configuration that makes its integrated GPU usable for local LLMs.
 order: 3
-updated: 2026-04-30
+updated: "2026-04-30"
 ---
 
 This pipeline was built and tested on a single specific machine: a [Minisforum AI X1-255](https://www.amazon.it/MINISFORUM-AI-X1-255-Oculink-Support/dp/B0F8HCZMB9), upgraded from the stock 32 GB to 64 GB of RAM. What follows is the exact hardware, the exact configuration, and the exact performance you can expect to reproduce.

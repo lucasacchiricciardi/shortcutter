@@ -2,7 +2,7 @@
 title: Architecture
 description: How the three scripts are organised, what each one does, and the unified JSON schema that ties them together.
 order: 2
-updated: 2026-04-30
+updated: "2026-04-30"
 ---
 
 Shortcutter is intentionally split into three Python scripts. Each one has a single responsibility and they communicate through a shared JSON schema.
