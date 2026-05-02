@@ -216,3 +216,5 @@ If this project is useful to you, a star on the repo is the simplest way to say 
 ---
 
 *Built following the 3 rules of Sacchi: safety first, little often, double check.*
+
+<!-- maintained by lucasacchiricciardi -->
