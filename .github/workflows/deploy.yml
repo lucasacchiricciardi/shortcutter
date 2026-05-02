@@ -15,6 +15,9 @@ permissions:
   pages: write
   id-token: write
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 concurrency:
   group: pages
   cancel-in-progress: false
@@ -22,18 +25,37 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      CI: true
+    defaults:
+      run:
+        working-directory: ./site
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@v5
 
-      - name: Build with Astro
-        uses: withastro/action@v3
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
         with:
-          path: ./site
-          node-version: 22
-          package-manager: npm
+          node-version: '24'
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+          node --version
+
+      - name: Build Astro site
+        run: npm run build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./site/dist
 
   deploy:
     needs: build
