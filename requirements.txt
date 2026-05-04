@@ -1,11 +1,9 @@
 # Core HTTP client
 httpx>=0.27.0
 
-# Audio transcription (CPU-friendly)
-faster-whisper>=1.0.0
-
 # yt-dlp for YouTube downloads
 yt-dlp>=2026.03.17
 
 # Note: ffmpeg must be installed system-wide
 # Note: Ollama must be running on http://localhost:11434
+# Note: Whisper API service must be running on http://192.168.254.115:5001 (or override via --whisper-api-url)

@@ -19,10 +19,10 @@ Pipeline:
 
 Stack:
   - llava:7b (~5 GB, vision)
-  - whisper-medium (CPU, ~1.5 GB)
+  - Whisper API service (192.168.254.115:5001, remote)
   - qwen3.5:4b (~3.4 GB)
 
-Tempo medio: ~3-4 minuti per short da 60-90 secondi.
+Tempo medio: ~2-3 minuti per short da 60-90 secondi (no local Whisper model).
 
 Uso:
   python3 analyze_short.py "URL"
@@ -48,6 +48,7 @@ from pathlib import Path
 import httpx
 
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
+WHISPER_API_URL = os.environ.get("WHISPER_API_URL", "http://192.168.254.115:5001")
 
 DEFAULT_VISION_MODEL = "llava:7b"
 DEFAULT_TEXT_MODEL = "qwen3.5:4b"
@@ -284,38 +285,49 @@ WHISPER_INITIAL_PROMPT = (
 )
 
 
-def transcribe_audio(audio_path: Path, model_size: str) -> AudioData:
+def transcribe_audio(
+    audio_path: Path,
+    model_size: str,
+    whisper_api_url: str = WHISPER_API_URL,
+) -> AudioData:
+    print(f"\n🎙️  Trascrizione con whisper-{model_size} (via API {whisper_api_url})...")
+    t0 = time.time()
+
     try:
-        from faster_whisper import WhisperModel
-    except ImportError:
-        print("❌ faster-whisper non installato. pip install faster-whisper")
+        with open(audio_path, "rb") as f:
+            r = httpx.post(
+                f"{whisper_api_url}/transcribe",
+                files={"audio": (audio_path.name, f)},
+                data={
+                    "model": model_size,
+                    "language": "",
+                    "initial_prompt": WHISPER_INITIAL_PROMPT,
+                },
+                timeout=300,
+            )
+        r.raise_for_status()
+        result = r.json()
+    except Exception as e:
+        print(f"❌ Errore Whisper API: {e}")
         sys.exit(1)
 
-    print(f"\n🎙️  Trascrizione con whisper-{model_size} (autodetect)...")
-    t0 = time.time()
-    model = WhisperModel(model_size, device="cpu", compute_type="int8")
-    segments, info = model.transcribe(
-        str(audio_path),
-        beam_size=5,
-        vad_filter=True,
-        vad_parameters={"min_silence_duration_ms": 500},
-        initial_prompt=WHISPER_INITIAL_PROMPT,
-    )
-    transcript = " ".join(seg.text.strip() for seg in segments).strip()
     elapsed = time.time() - t0
+    transcript = result.get("text", "").strip()
+    language = result.get("language", "unknown")
+    language_prob = result.get("language_probability", 0.0)
 
     print(f"✅ Trascrizione in {elapsed:.1f}s ({len(transcript)} char)")
-    print(f"   Lingua: {info.language} (prob: {info.language_probability:.2f})")
+    print(f"   Lingua: {language} (prob: {language_prob:.2f})")
     if transcript:
         preview = transcript[:200] + "..." if len(transcript) > 200 else transcript
         print(f"   Testo: {preview}")
 
     return AudioData(
-        language=info.language,
-        language_probability=info.language_probability,
+        language=language,
+        language_probability=language_prob,
         transcript_raw=transcript,
-        transcript_corrected=transcript,  # default, sovrascritto dal fixer se attivo
-        transcript=transcript,  # alias backward compat
+        transcript_corrected=transcript,
+        transcript=transcript,
         whisper_model=model_size,
         duration_sec=round(elapsed, 1),
     )
@@ -968,7 +980,9 @@ def main():
     parser.add_argument("--vision-model", default=DEFAULT_VISION_MODEL)
     parser.add_argument("--text-model", default=DEFAULT_TEXT_MODEL)
     parser.add_argument("--whisper-model", default=DEFAULT_WHISPER_MODEL,
-                        choices=["tiny", "base", "small", "medium", "large-v3"])
+                        choices=["tiny", "base", "small", "medium", "large-v3", "large-v3-turbo"])
+    parser.add_argument("--whisper-api-url", default=WHISPER_API_URL,
+                        help=f"URL Whisper API service (default: {WHISPER_API_URL})")
     parser.add_argument("--no-audio", action="store_true")
     parser.add_argument("--no-fix", action="store_true",
                         help="disabilita il transcript fixer LLM (più veloce, transcript Whisper raw)")
@@ -1025,7 +1039,7 @@ def main():
         # 3. Audio + Whisper
         if not args.no_audio:
             audio = extract_audio(video, workdir)
-            result.audio = transcribe_audio(audio, args.whisper_model)
+            result.audio = transcribe_audio(audio, args.whisper_model, args.whisper_api_url)
 
         # 3.5. Transcript fixer LLM (corregge errori Whisper usando description)
         # Skip per transcript corti: il modello 4B su short brevi tende ad
